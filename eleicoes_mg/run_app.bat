@@ -4,6 +4,6 @@ call d:\venv_eleicoes\Scripts\activate.bat
 
 echo.
 echo Iniciando aplicacao Streamlit...
-streamlit run app.py
+streamlit run app_eleicoes_mg.py
 
 pause
