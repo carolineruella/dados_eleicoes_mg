@@ -33,58 +33,49 @@ DATA_FILE = "eleicoes_2022_mg_filtrados_agregado.csv"
 def load_data():
     """Carrega os dados filtrados do arquivo CSV local"""
     try:
-        # Procurar arquivo filtrado
-        arquivos = [glob.glob(DATA_FILE)]
+        st.info("📥 Executando script de filtragem automaticamente...")
 
-        if not arquivos:
-            st.warning(f"⚠️ Arquivo de dados agregado não encontrado: {DATA_FILE}")
-            st.info("📥 Executando script de filtragem automaticamente...")
+        # Executar o script de filtragem
+        script_path = os.path.join(os.path.dirname(__file__), 'filtrar_municipios_stream.py')
 
-            # Executar o script de filtragem
-            script_path = os.path.join(os.path.dirname(__file__), 'filtrar_municipios_stream.py')
+        if os.path.exists(script_path):
+            with st.spinner("🔄 Baixando e processando dados do TSE... Isso pode levar alguns minutos."):
+                try:
+                    # Executar o script
+                    result = subprocess.run(
+                        [sys.executable, script_path],
+                        capture_output=True,
+                        text=True,
+                        timeout=600  # Timeout de 10 minutos
+                    )
 
-            if os.path.exists(script_path):
-                with st.spinner("🔄 Baixando e processando dados do TSE... Isso pode levar alguns minutos."):
-                    try:
-                        # Executar o script
-                        result = subprocess.run(
-                            [sys.executable, script_path],
-                            capture_output=True,
-                            text=True,
-                            timeout=600  # Timeout de 10 minutos
-                        )
+                    if result.returncode == 0:
+                        st.success("✅ Dados processados com sucesso!")
 
-                        if result.returncode == 0:
-                            st.success("✅ Dados processados com sucesso!")
-
-                            # Tentar carregar novamente
-                            arquivos = glob.glob(DATA_FILE)
-                            if arquivos:
-                                arquivo_mais_recente = max(arquivos, key=os.path.getmtime)
-                                with st.spinner(f"📂 Carregando dados de {os.path.basename(arquivo_mais_recente)}..."):
-                                    df = pd.read_csv(arquivo_mais_recente, encoding='utf-8-sig', sep=';')
-                                    return df
+                        # Tentar carregar o arquivo gerado
+                        arquivos = glob.glob(DATA_FILE)
+                        if arquivos:
+                            arquivo_mais_recente = max(arquivos, key=os.path.getmtime)
+                            with st.spinner(f"📂 Carregando dados de {os.path.basename(arquivo_mais_recente)}..."):
+                                df = pd.read_csv(arquivo_mais_recente, encoding='utf-8-sig', sep=';')
+                                return df
                         else:
-                            st.error(f"❌ Erro ao executar filtrar_municipios_stream.py:\n{result.stderr}")
+                            st.error(f"❌ Arquivo não encontrado após processamento: {DATA_FILE}")
                             return None
-
-                    except subprocess.TimeoutExpired:
-                        st.error("❌ Timeout: O processo demorou mais de 10 minutos.")
+                    else:
+                        st.error(f"❌ Erro ao executar filtrar_municipios_stream.py:\n{result.stderr}")
                         return None
-                    except Exception as e:
-                        st.error(f"❌ Erro ao executar script: {str(e)}")
-                        return None
-            else:
-                st.error(f"❌ Script não encontrado: {script_path}")
-                st.info("Execute manualmente: `python filtrar_municipios_stream.py`")
-                return None
 
-        # Usar o arquivo mais recente se houver múltiplos
-        arquivo_mais_recente = max(arquivos, key=os.path.getmtime)
-
-        with st.spinner(f"📂 Carregando dados de {os.path.basename(arquivo_mais_recente)}..."):
-            df = pd.read_csv(arquivo_mais_recente, encoding='utf-8-sig', sep=';')
-            return df
+                except subprocess.TimeoutExpired:
+                    st.error("❌ Timeout: O processo demorou mais de 10 minutos.")
+                    return None
+                except Exception as e:
+                    st.error(f"❌ Erro ao executar script: {str(e)}")
+                    return None
+        else:
+            st.error(f"❌ Script não encontrado: {script_path}")
+            st.info("Execute manualmente: `python filtrar_municipios_stream.py`")
+            return None
 
     except Exception as e:
         st.error(f"❌ Erro ao carregar dados: {str(e)}")
