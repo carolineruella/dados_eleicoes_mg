@@ -6,7 +6,7 @@ from datetime import datetime
 from collections import defaultdict
 
 # Lista de municípios para filtrar (normalizados - sem acentos)
-'''MUNICIPIOS_FILTRAR = {
+MUNICIPIOS_FILTRAR = {
     'BELO HORIZONTE',
     'RIBEIRAO DAS NEVES',
     'SABARA',
@@ -35,10 +35,7 @@ from collections import defaultdict
     'SANTA BARBARA',
     'ALMENARA',
     'FELISBURGO'
-}'''
-
-MUNICIPIOS_FILTRAR = {
-    'PASSOS'}
+}
 
 print("="*80)
 print("FILTRO DE DADOS ELEITORAIS - TSE 2022")
