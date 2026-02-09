@@ -26,8 +26,8 @@ st.title("📊 Eleições 2022 - Minas Gerais")
 st.markdown("### Municípios Selecionados - Votação Agregada por Local de Votação")
 
 # Arquivo de dados local (agregado por endereço e candidato)
-DATA_FILE = "eleicoes_2022_mg_filtrados_agregado.csv"
-'''DATA_FILE = "eleicoes_2022_mg_filtrados_*_agregado.csv"'''
+DATA_FILE = "eleicoes_2022_mg_filtrados_*_agregado.csv"
+'''DATA_FILE = "eleicoes_2022_mg_filtrados_agregado.csv"'''
 
 @st.cache_data
 def load_data():
